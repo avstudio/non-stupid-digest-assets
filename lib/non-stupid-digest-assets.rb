@@ -4,6 +4,9 @@ module NonStupidDigestAssets
   mattr_accessor :whitelist
   @@whitelist = []
 
+  mattr_accessor :delete_digest_file
+  @@delete_digest_file = false
+
   class << self
     def assets(assets)
       return assets if whitelist.empty?
@@ -33,12 +36,14 @@ module NonStupidDigestAssets
         if File.exists? full_digest_path
           logger.debug "Writing #{full_non_digest_path}"
           FileUtils.copy_file full_digest_path, full_non_digest_path, :preserve_attributes
+          FileUtils.rm full_digest_path if NonStupidDigestAssets.delete_digest_file
         else
           logger.debug "Could not find: #{full_digest_path}"
         end
         if File.exists? full_digest_gz_path
           logger.debug "Writing #{full_non_digest_gz_path}"
           FileUtils.copy_file full_digest_gz_path, full_non_digest_gz_path, :preserve_attributes
+          FileUtils.rm full_digest_gz_path if NonStupidDigestAssets.delete_digest_file
         else
           logger.debug "Could not find: #{full_digest_gz_path}"
         end
